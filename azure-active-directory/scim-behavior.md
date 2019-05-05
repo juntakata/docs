@@ -134,14 +134,14 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJLVmN1enFBaWRPTHFXU2FvbDd3Z0ZSR0NZ
         "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
     ],
     "externalId": "clouduser03",
-    "userName": "clouduser03@jutakata02.onmicrosoft.com",
+    "userName": "clouduser03@contoso.onmicrosoft.com",
     "active": true,
     "displayName": "clouduser03",
     "emails": [
         {
             "primary": true,
             "type": "work",
-            "value": "clouduser03@jutakata02.onmicrosoft.com"
+            "value": "clouduser03@contoso.onmicrosoft.com"
         }
     ],
     "meta": {
@@ -169,7 +169,7 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJLVmN1enFBaWRPTHFXU2FvbDd3Z0ZSR0NZ
         {
             "primary": true,
             "type": "work",
-            "value": "clouduser03@jutakata02.onmicrosoft.com"
+            "value": "clouduser03@contoso.onmicrosoft.com"
         }
     ],
     "meta": {
@@ -191,14 +191,14 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJLVmN1enFBaWRPTHFXU2FvbDd3Z0ZSR0NZ
         "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
     ],
     "externalId": "clouduser01",
-    "userName": "clouduser01@jutakata02.onmicrosoft.com",
+    "userName": "clouduser01@contoso.onmicrosoft.com",
     "active": true,
     "displayName": "clouduser01",
     "emails": [
         {
             "primary": true,
             "type": "work",
-            "value": "clouduser01@jutakata02.msftonlinerepro.com"
+            "value": "clouduser01@contoso.msftonlinerepro.com"
         }
     ],
     "meta": {
@@ -226,7 +226,7 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJLVmN1enFBaWRPTHFXU2FvbDd3Z0ZSR0NZ
         {
             "primary": true,
             "type": "work",
-            "value": "clouduser01@jutakata02.msftonlinerepro.com"
+            "value": "clouduser01@contoso.msftonlinerepro.com"
         }
     ],
     "meta": {
@@ -248,14 +248,14 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJLVmN1enFBaWRPTHFXU2FvbDd3Z0ZSR0NZ
         "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
     ],
     "externalId": "clouduser02",
-    "userName": "clouduser02@jutakata02.onmicrosoft.com",
+    "userName": "clouduser02@contoso.onmicrosoft.com",
     "active": true,
     "displayName": "clouduser02",
     "emails": [
         {
             "primary": true,
             "type": "work",
-            "value": "clouduser02@jutakata02.onmicrosoft.com"
+            "value": "clouduser02@contoso.onmicrosoft.com"
         }
     ],
     "meta": {
@@ -283,7 +283,7 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJLVmN1enFBaWRPTHFXU2FvbDd3Z0ZSR0NZ
         {
             "primary": true,
             "type": "work",
-            "value": "clouduser02@jutakata02.onmicrosoft.com"
+            "value": "clouduser02@contoso.onmicrosoft.com"
         }
     ],
     "meta": {
@@ -305,7 +305,7 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJLVmN1enFBaWRPTHFXU2FvbDd3Z0ZSR0NZ
         "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
     ],
     "externalId": "jutakata",
-    "userName": "jutakata@jutakata02.onmicrosoft.com",
+    "userName": "jutakata@contoso.onmicrosoft.com",
     "active": true,
     "addresses": [
         {
@@ -324,7 +324,7 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJLVmN1enFBaWRPTHFXU2FvbDd3Z0ZSR0NZ
         {
             "primary": true,
             "type": "work",
-            "value": "jutakata@jutakata02.onmicrosoft.com"
+            "value": "jutakata@contoso.onmicrosoft.com"
         }
     ],
     "meta": {
@@ -374,7 +374,7 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJLVmN1enFBaWRPTHFXU2FvbDd3Z0ZSR0NZ
         {
             "primary": true,
             "type": "work",
-            "value": "jutakata@jutakata02.onmicrosoft.com"
+            "value": "jutakata@contoso.onmicrosoft.com"
         }
     ],
     "meta": {
@@ -424,7 +424,7 @@ Active が false になり、Delete ではなく Patch になります。
             "value": [
                 {
                     "$ref": null,
-                    "value": "clouduser01@jutakata02.onmicrosoft.com"
+                    "value": "clouduser01@contoso.onmicrosoft.com"
                 }
             ]
         }
@@ -460,7 +460,7 @@ Active が false になり、Delete ではなく Patch になります。
             "value": [
                 {
                     "$ref": null,
-                    "value": "clouduser01@jutakata02.onmicrosoft.com"
+                    "value": "clouduser01@contoso.onmicrosoft.com"
                 }
             ]
         }
@@ -496,7 +496,7 @@ Active が false になり、Delete ではなく Patch になります。
             "value": [
                 {
                     "$ref": null,
-                    "value": "clouduser01@jutakata02.onmicrosoft.com"
+                    "value": "clouduser01@contoso.onmicrosoft.com"
                 }
             ]
         }
@@ -513,8 +513,8 @@ Active が false になり、Delete ではなく Patch になります。
 Hard-delete で DELETE のコマンドが出ます。ユーザーがアプリに割り当てられ、プロビジョニングされている状態で以下を実行しました。
 
 ```powershell
-Remove-MsolUser -UserPrincipalName clouduser01@jutakata02.onmicrosoft.com
-Remove-MsolUser -UserPrincipalName clouduser01@jutakata02.onmicrosoft.com -RemoveFromRecycleBin
+Remove-MsolUser -UserPrincipalName clouduser01@contoso.onmicrosoft.com
+Remove-MsolUser -UserPrincipalName clouduser01@contoso.onmicrosoft.com -RemoveFromRecycleBin
 ```
 
 パケットのやり取りは以下のとおりです。
@@ -537,7 +537,7 @@ Remove-MsolUser -UserPrincipalName clouduser01@jutakata02.onmicrosoft.com -Remov
         "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
     ],
     "externalId": "clouduser01",
-    "userName": "clouduser01@jutakata02.onmicrosoft.com",
+    "userName": "clouduser01@contoso.onmicrosoft.com",
     "active": true,
     "displayName": "clouduser01",
     "meta": {
@@ -606,7 +606,7 @@ Remove-MsolUser -UserPrincipalName clouduser01@jutakata02.onmicrosoft.com -Remov
             "value": [
                 {
                     "$ref": null,
-                    "value": "clouduser01@jutakata02.onmicrosoft.com"
+                    "value": "clouduser01@contoso.onmicrosoft.com"
                 }
             ]
         }
@@ -618,7 +618,7 @@ Remove-MsolUser -UserPrincipalName clouduser01@jutakata02.onmicrosoft.com -Remov
 17077    1546.312533    10.2.2.4    52.173.199.78    HTTP    168    HTTP/1.1 204 No Content 
 ```
 
-Remove-MsolUser -UserPrincipalName clouduser01@jutakata02.onmicrosoft.com を実行します。
+Remove-MsolUser -UserPrincipalName clouduser01@contoso.onmicrosoft.com を実行します。
 なぜか patch が来ているが特に変化はありません。
 
 ```
@@ -642,7 +642,7 @@ Remove-MsolUser -UserPrincipalName clouduser01@jutakata02.onmicrosoft.com を実
             "value": [
                 {
                     "$ref": null,
-                    "value": "clouduser01@jutakata02.onmicrosoft.com"
+                    "value": "clouduser01@contoso.onmicrosoft.com"
                 }
             ]
         }
@@ -654,7 +654,7 @@ Remove-MsolUser -UserPrincipalName clouduser01@jutakata02.onmicrosoft.com を実
 25609    2613.349816    10.2.2.4    52.161.102.217    HTTP    168    HTTP/1.1 204 No Content 
 ```
 
-Remove-MsolUser -UserPrincipalName clouduser01@jutakata02.onmicrosoft.com -RemoveFromRecycleBin を実行します。
+Remove-MsolUser -UserPrincipalName clouduser01@contoso.onmicrosoft.com -RemoveFromRecycleBin を実行します。
 割り当てにはいないのに削除されます。
 
 ```
