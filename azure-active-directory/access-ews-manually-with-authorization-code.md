@@ -5,7 +5,7 @@
 1. Go to Azure portal
 2. Go to Azure Active Directory blade
 3. Select [App registrations]
-4. [+ New registration]
+4. Select [+ New registration]
 5. Specify new name and select [Public client (mobile & desktop)]
 6. Specify https://localhost as a redirect URI.
 7. Select [Register]
