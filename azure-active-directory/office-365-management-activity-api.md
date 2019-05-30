@@ -77,6 +77,8 @@ GET https://manage.office.com/api/v1.0/d7a85814-4d89-4baf-8a8a-f5be8306a959/acti
 Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSU...
 ```
 
+### Response
+
 ```json
 [
     {
@@ -117,7 +119,7 @@ Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSU...
 ]
 ```
 
-### Retrieving content
+## Retrieving content
 
 ### Request
 
