@@ -11,25 +11,26 @@ You can create appid and password using Azure CLI programatically. See below how
 
     ```json
     {
-    "acceptMappedClaims": null,
-    "addIns": [],
-    "allowGuestsSignIn": null,
-    "allowPassthroughUsers": null,
-    "appId": "1282bdfd-c03d-4dbe-ad70-9fca4f7fd418",
-    "appLogoUrl": null,
-    "appPermissions": null,
-    "appRoles": [],
-    "applicationTemplateId": null,
-    "availableToOtherTenants": false,
-    "deletionTimestamp": null,
-    "displayName": "ContosoAzCliApp",
-    "errorUrl": null,
-    "groupMembershipClaims": null,
-    "homepage": null,
-    "identifierUris": [
-        "https://contoso.onmicrosoft.com/ContosoAzCliApp"
-    ],
-    ...
+        "acceptMappedClaims": null,
+        "addIns": [],
+        "allowGuestsSignIn": null,
+        "allowPassthroughUsers": null,
+        "appId": "1282bdfd-c03d-4dbe-ad70-9fca4f7fd418",
+        "appLogoUrl": null,
+        "appPermissions": null,
+        "appRoles": [],
+        "applicationTemplateId": null,
+        "availableToOtherTenants": false,
+        "deletionTimestamp": null,
+        "displayName": "ContosoAzCliApp",
+        "errorUrl": null,
+        "groupMembershipClaims": null,
+        "homepage": null,
+        "identifierUris": [
+            "https://contoso.onmicrosoft.com/ContosoAzCliApp"
+        ],
+        ...
+    }
     ```
 
 3. Copy the value of "appid"
