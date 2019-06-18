@@ -37,7 +37,7 @@
     ```
     $ az role assignment create --role "Storage Account Key Operator Service Role" --assignee-object-id "bffbdcb7-0c5c-4765-96ad-1b78655a6ce1" --scope "/subscriptions/xxxxxxxx-4516-450e-a37f-76e65755465f/resourceGroups/keyvlt-prod-rg/providers/Microsoft.Storage/storageAccounts/juntakatakvsa"
     ```
-    ```
+    ```json
     {
       "canDelegate": null,
       "id": "/subscriptions/xxxxxxxx-4516-450e-a37f-76e65755465f/resourceGroups/keyvlt-prod-rg/providers/Microsoft.Storage/storageAccounts/juntakatakvsa/providers/Microsoft.Authorization/roleAssignments/55a893ca-ce0e-44bc-a6dc-7a034bec112a",
@@ -53,9 +53,9 @@
 5. Create a Key Vault Managed Storage Account.
 
     ```
-    $ az keyvault storage add --vault-name keyvlt-prod-kv1 -n juntakatakvsa --active-key-name key1 --auto-regenerate-key --regeneration-period P90D --resource-id "/subscriptions/xxxxxxxx-4516-450e-a37f-76e65755465f/resourceGroups/keyvlt-prod-rg/providers/Microsoft.Storage/storageAccounts/juntakatakvsa"
+    $ az keyvault storage add --vault-name keyvlt-prod-kv -n juntakatakvsa --active-key-name key1 --auto-regenerate-key --regeneration-period P90D --resource-id "/subscriptions/xxxxxxxx-4516-450e-a37f-76e65755465f/resourceGroups/keyvlt-prod-rg/providers/Microsoft.Storage/storageAccounts/juntakatakvsa"
     ```
-    ```
+    ```json
     {
       "activeKeyName": "key1",
       "attributes": {
@@ -86,7 +86,7 @@
     ```
     $ az keyvault storage sas-definition create --vault-name keyvlt-prod-kv --account-name juntakatakvsa -n juntakatasasdefinition --validity-period P90D --sas-type account --template-uri "se=2020-01-01&sp=***gbeBWJaFUYLpbPa9hWP9HPA4Tno%3D"
     ```
-    ```
+    ```json
     {
       "attributes": {
         "created": "2019-05-01T00:34:16+00:00",
@@ -102,6 +102,52 @@
       "validityPeriod": "P90D"
     }
     ```
+
+To regenerate storage account key, run a command as below.
+
+```
+$ az keyvault storage regenerate-key --vault-name keyvlt-prod-kv --name juntakatakvsa --key-name key1
+```
+```json
+{
+    "activeKeyName": "key1",
+    "attributes": {
+    "created": "2019-04-30T08:45:00+00:00",
+    "enabled": true,
+    "recoveryLevel": "Purgeable",
+    "updated": "2019-04-30T08:45:00+00:00"
+    },
+    "autoRegenerateKey": true,
+    "id": "https://keyvlt-prod-kv.vault.azure.net/storage/juntakatakvsa",
+    "regenerationPeriod": "P90D",
+    "resourceId": "/subscriptions/xxxxxxxx-4516-450e-a37f-76e65755465f/resourceGroups/keyvlt-prod-rg/providers/Microsoft.Storage/storageAccounts/juntakatakvsa",
+    "tags": null
+}
+```
+
+You can see the Key Vault secret as below.
+
+```
+$ az keyvault secret show --vault-name keyvlt-prod-kv --name juntakatakvsa-juntakatasasdefinition
+```
+```json
+{
+  "attributes": {
+    "created": null,
+    "enabled": true,
+    "expires": "2019-09-16T07:36:38+00:00",
+    "notBefore": null,
+    "recoveryLevel": "Purgeable",
+    "updated": null
+  },
+  "contentType": "application/vnd.ms-sastoken-storage",
+  "id": "https://keyvlt-prod-kv.vault.azure.net/secrets/juntakatakvsa-juntakatasasdefinition",
+  "kid": null,
+  "managed": true,
+  "tags": null,
+  "value": "?sv=2018-03-28&***uJPV1lBdb8kk7EPXyU%3D"
+}
+```
 
 ## Create C# .NET Core Console Application
 
