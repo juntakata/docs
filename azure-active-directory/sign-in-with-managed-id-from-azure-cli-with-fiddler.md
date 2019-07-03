@@ -2,18 +2,15 @@
 # Sign-in with Managed ID from Azure cLI with Fiddler
 
 ## Prerequisite
+
+### Fiddler trace
+
 To capture a Fiddler trace for Azure CLI, you need to set some environment variables. These variables apply for all Azure CLI environments such as Windows, Linux, and etc.
 
 ```
 set AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
 set HTTPS_PROXY=https://127.0.0.1:8888
 set HTTP_PROXY=http://127.0.0.1:8888
-```
-
-If you do not want to disable connection verification, you can add your local proxy certificate to a file below.
-
-```
-C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\Lib\site-packages\certifi\cacert.pem
 ```
 
 After capturing the trace, disable each variables as below.
@@ -23,6 +20,24 @@ set AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=
 set HTTPS_PROXY=
 set HTTP_PROXY=
 ```
+
+If you do not want to disable connection verification, you can add your local proxy certificate to a file below.
+
+```
+C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\Lib\site-packages\certifi\cacert.pem
+```
+
+### Python logger
+
+If you also want to generate a log file from Python code, add folloiwng contents to a config file under $HOME/.azure/config (Linux, macOSzure) or %USERPROFILE%\\.azure\config (Windows).
+
+```
+[logging]
+enable_log_file=yes
+log_dir=C:\temp\
+```
+
+You can do the same settings by adding environment variables ``AZURE_Logging_enable_log_file=yes`` and ``AZURE_Logging_log_dir=C:\temp\`` to user or system variables.
 
 ## Debug output when Sing-in with Managed ID
 
@@ -214,3 +229,100 @@ Content-Length: 12
 {"value":[]}
 ```
 
+## Python logging
+
+```
+1868 : 2019-07-02 08:57:37,701 : DEBUG : cli.knack.log : File logging enabled - writing logs to 'C:\'.
+1868 : 2019-07-02 08:57:37,701 : DEBUG : cli.knack.cli : Command arguments: ['login', '--identity']
+1868 : 2019-07-02 08:57:37,701 : DEBUG : cli.knack.cli : Event: Cli.PreExecute []
+1868 : 2019-07-02 08:57:37,701 : DEBUG : cli.knack.cli : Event: CommandParser.OnGlobalArgumentsCreate [<function CLILogging.on_global_arguments at 0x02F9FB28>, <function OutputProducer.on_global_arguments at 0x02FE8858>, <function CLIQuery.on_global_arguments at 0x03006930>]
+1868 : 2019-07-02 08:57:37,748 : DEBUG : cli.knack.cli : Event: CommandInvoker.OnPreCommandTableCreate []
+1868 : 2019-07-02 08:57:37,765 : DEBUG : cli.azure.cli.core : Installed command modules ['acr', 'acs', 'advisor', 'ams', 'appservice', 'backup', 'batch', 'batchai', 'billing', 'botservice', 'cdn', 'cloud', 'cognitiveservices', 'configure', 'consumption', 'container', 'cosmosdb', 'deploymentmanager', 'dla', 'dls', 'dms', 'eventgrid', 'eventhubs', 'extension', 'feedback', 'find', 'hdinsight', 'interactive', 'iot', 'iotcentral', 'keyvault', 'kusto', 'lab', 'maps', 'monitor', 'natgateway', 'network', 'policyinsights', 'privatedns', 'profile', 'rdbms', 'redis', 'relay', 'reservations', 'resource', 'role', 'search', 'security', 'servicebus', 'servicefabric', 'signalr', 'sql', 'sqlvm', 'storage', 'vm']
+1868 : 2019-07-02 08:57:37,765 : DEBUG : cli.azure.cli.core : Loaded module 'acr' in 0.008 seconds.
+1868 : 2019-07-02 08:57:37,780 : DEBUG : cli.azure.cli.core : Loaded module 'acs' in 0.006 seconds.
+1868 : 2019-07-02 08:57:37,780 : DEBUG : cli.azure.cli.core : Loaded module 'advisor' in 0.003 seconds.
+1868 : 2019-07-02 08:57:37,780 : DEBUG : cli.knack.cli : Event: CommandLoader.OnLoadCommandTable []
+1868 : 2019-07-02 08:57:37,780 : DEBUG : cli.azure.cli.core : Loaded module 'ams' in 0.009 seconds.
+1868 : 2019-07-02 08:57:37,795 : DEBUG : cli.azure.cli.core : Loaded module 'appservice' in 0.011 seconds.
+1868 : 2019-07-02 08:57:37,795 : DEBUG : cli.azure.cli.core : Loaded module 'backup' in 0.005 seconds.
+1868 : 2019-07-02 08:57:37,811 : DEBUG : cli.knack.cli : Event: CommandLoader.OnLoadCommandTable []
+1868 : 2019-07-02 08:57:37,811 : DEBUG : cli.azure.cli.core : Loaded module 'batch' in 0.014 seconds.
+1868 : 2019-07-02 08:57:37,826 : DEBUG : cli.azure.cli.core : Loaded module 'batchai' in 0.006 seconds.
+1868 : 2019-07-02 08:57:37,826 : DEBUG : cli.azure.cli.core : Loaded module 'billing' in 0.004 seconds.
+1868 : 2019-07-02 08:57:37,826 : DEBUG : cli.azure.cli.core : Loaded module 'botservice' in 0.006 seconds.
+1868 : 2019-07-02 08:57:37,842 : DEBUG : cli.knack.cli : Event: CommandLoader.OnLoadCommandTable []
+1868 : 2019-07-02 08:57:37,842 : DEBUG : cli.azure.cli.core : Loaded module 'cdn' in 0.005 seconds.
+1868 : 2019-07-02 08:57:37,842 : DEBUG : cli.azure.cli.core : Loaded module 'cloud' in 0.004 seconds.
+1868 : 2019-07-02 08:57:37,842 : DEBUG : cli.azure.cli.core : Loaded module 'cognitiveservices' in 0.004 seconds.
+1868 : 2019-07-02 08:57:37,842 : DEBUG : cli.azure.cli.core : Loaded module 'configure' in 0.003 seconds.
+1868 : 2019-07-02 08:57:37,858 : DEBUG : cli.azure.cli.core : Loaded module 'consumption' in 0.007 seconds.
+1868 : 2019-07-02 08:57:37,858 : DEBUG : cli.azure.cli.core : Loaded module 'container' in 0.004 seconds.
+1868 : 2019-07-02 08:57:37,873 : DEBUG : cli.azure.cli.core : Loaded module 'cosmosdb' in 0.009 seconds.
+1868 : 2019-07-02 08:57:37,873 : DEBUG : cli.azure.cli.core : Loaded module 'deploymentmanager' in 0.004 seconds.
+1868 : 2019-07-02 08:57:37,889 : DEBUG : cli.azure.cli.core : Loaded module 'dla' in 0.007 seconds.
+1868 : 2019-07-02 08:57:37,889 : DEBUG : cli.azure.cli.core : Loaded module 'dls' in 0.006 seconds.
+1868 : 2019-07-02 08:57:37,889 : DEBUG : cli.azure.cli.core : Loaded module 'dms' in 0.004 seconds.
+1868 : 2019-07-02 08:57:37,905 : DEBUG : cli.azure.cli.core : Loaded module 'eventgrid' in 0.007 seconds.
+1868 : 2019-07-02 08:57:37,905 : DEBUG : cli.azure.cli.core : Loaded module 'eventhubs' in 0.007 seconds.
+1868 : 2019-07-02 08:57:37,905 : DEBUG : cli.azure.cli.core : Loaded module 'extension' in 0.002 seconds.
+1868 : 2019-07-02 08:57:37,905 : DEBUG : cli.azure.cli.core : Loaded module 'feedback' in 0.002 seconds.
+1868 : 2019-07-02 08:57:37,921 : DEBUG : cli.azure.cli.core : Loaded module 'find' in 0.003 seconds.
+1868 : 2019-07-02 08:57:37,921 : DEBUG : cli.azure.cli.core : Loaded module 'hdinsight' in 0.004 seconds.
+1868 : 2019-07-02 08:57:37,921 : DEBUG : cli.azure.cli.core : Loaded module 'interactive' in 0.001 seconds.
+1868 : 2019-07-02 08:57:37,921 : DEBUG : cli.azure.cli.core : Loaded module 'iot' in 0.007 seconds.
+1868 : 2019-07-02 08:57:37,936 : DEBUG : cli.azure.cli.core : Loaded module 'iotcentral' in 0.004 seconds.
+1868 : 2019-07-02 08:57:37,936 : DEBUG : cli.azure.cli.core : Loaded module 'keyvault' in 0.009 seconds.
+1868 : 2019-07-02 08:57:37,951 : DEBUG : cli.azure.cli.core : Loaded module 'kusto' in 0.004 seconds.
+1868 : 2019-07-02 08:57:37,951 : DEBUG : cli.azure.cli.core : Loaded module 'lab' in 0.007 seconds.
+1868 : 2019-07-02 08:57:37,951 : DEBUG : cli.azure.cli.core : Loaded module 'maps' in 0.004 seconds.
+1868 : 2019-07-02 08:57:37,967 : DEBUG : cli.azure.cli.core : Loaded module 'monitor' in 0.009 seconds.
+1868 : 2019-07-02 08:57:37,967 : DEBUG : cli.azure.cli.core : Loaded module 'natgateway' in 0.004 seconds.
+1868 : 2019-07-02 08:57:38,014 : DEBUG : cli.azure.cli.core : Loaded module 'network' in 0.037 seconds.
+1868 : 2019-07-02 08:57:38,014 : DEBUG : cli.azure.cli.core : Loaded module 'policyinsights' in 0.006 seconds.
+1868 : 2019-07-02 08:57:38,014 : DEBUG : cli.azure.cli.core : Loaded module 'privatedns' in 0.008 seconds.
+1868 : 2019-07-02 08:57:38,030 : DEBUG : cli.azure.cli.core : Loaded module 'profile' in 0.003 seconds.
+1868 : 2019-07-02 08:57:38,030 : DEBUG : cli.azure.cli.core : Loaded module 'rdbms' in 0.009 seconds.
+1868 : 2019-07-02 08:57:38,030 : DEBUG : cli.azure.cli.core : Loaded module 'redis' in 0.004 seconds.
+1868 : 2019-07-02 08:57:38,045 : DEBUG : cli.azure.cli.core : Loaded module 'relay' in 0.006 seconds.
+1868 : 2019-07-02 08:57:38,045 : DEBUG : cli.azure.cli.core : Loaded module 'reservations' in 0.005 seconds.
+1868 : 2019-07-02 08:57:38,061 : DEBUG : cli.azure.cli.core : Loaded module 'resource' in 0.012 seconds.
+1868 : 2019-07-02 08:57:38,061 : DEBUG : cli.azure.cli.core : Loaded module 'role' in 0.008 seconds.
+1868 : 2019-07-02 08:57:38,076 : DEBUG : cli.azure.cli.core : Loaded module 'search' in 0.004 seconds.
+1868 : 2019-07-02 08:57:38,076 : DEBUG : cli.azure.cli.core : Loaded module 'security' in 0.005 seconds.
+1868 : 2019-07-02 08:57:38,092 : DEBUG : cli.azure.cli.core : Loaded module 'servicebus' in 0.008 seconds.
+1868 : 2019-07-02 08:57:38,092 : DEBUG : cli.azure.cli.core : Loaded module 'servicefabric' in 0.004 seconds.
+1868 : 2019-07-02 08:57:38,092 : DEBUG : cli.azure.cli.core : Loaded module 'signalr' in 0.003 seconds.
+1868 : 2019-07-02 08:57:38,108 : DEBUG : cli.azure.cli.core : Loaded module 'sql' in 0.012 seconds.
+1868 : 2019-07-02 08:57:38,108 : DEBUG : cli.azure.cli.core : Loaded module 'sqlvm' in 0.005 seconds.
+1868 : 2019-07-02 08:57:38,108 : DEBUG : cli.knack.cli : Event: CommandLoader.OnLoadCommandTable []
+1868 : 2019-07-02 08:57:38,155 : DEBUG : cli.azure.cli.core : Loaded module 'storage' in 0.042 seconds.
+1868 : 2019-07-02 08:57:38,170 : DEBUG : cli.azure.cli.core : Loaded module 'vm' in 0.023 seconds.
+1868 : 2019-07-02 08:57:38,170 : DEBUG : cli.azure.cli.core : Loaded all modules in 0.406 seconds. (note: there's always an overhead with the first module loaded)
+1868 : 2019-07-02 08:57:38,186 : DEBUG : cli.azure.cli.core.extension : Extensions directory: 'C:\Users\testuser\.azure\cliextensions'
+1868 : 2019-07-02 08:57:38,186 : DEBUG : cli.knack.cli : Event: CommandInvoker.OnPreCommandTableTruncate [<function AzCliLogging.init_command_file_logging at 0x0305AC48>]
+1868 : 2019-07-02 08:57:38,186 : INFO : az_command_data_logger : command args: login --identity
+1868 : 2019-07-02 08:57:38,186 : DEBUG : cli.azure.cli.core.azlogging : metadata file logging enabled - writing logs to 'C:\Users\testuser\.azure\commands'.
+1868 : 2019-07-02 08:57:38,405 : DEBUG : cli.knack.cli : Event: CommandInvoker.OnPostCommandTableCreate [<function register_global_subscription_argument.<locals>.add_subscription_parameter at 0x0309B4B0>, <function register_ids_argument.<locals>.add_ids_arguments at 0x0309B4F8>, <function register_cache_arguments.<locals>.add_cache_arguments at 0x0309B6F0>]
+1868 : 2019-07-02 08:57:38,405 : DEBUG : cli.knack.cli : Event: CommandInvoker.OnCommandTableLoaded []
+1868 : 2019-07-02 08:57:38,405 : DEBUG : cli.knack.cli : Event: CommandInvoker.OnPreParseArgs [<function _documentdb_deprecate at 0x039F1618>]
+1868 : 2019-07-02 08:57:38,405 : DEBUG : cli.knack.cli : Event: CommandInvoker.OnPostParseArgs [<function OutputProducer.handle_output_argument at 0x02FE88A0>, <function CLIQuery.handle_query_parameter at 0x03006978>, <function register_ids_argument.<locals>.parse_ids_arguments at 0x0309B6A8>, <function handler at 0x03AB0390>]
+1868 : 2019-07-02 08:57:38,467 : DEBUG : urllib3.connectionpool : Starting new HTTP connection (1): 169.254.169.254:80
+1868 : 2019-07-02 08:57:38,981 : DEBUG : urllib3.connectionpool : http://169.254.169.254:80 "GET /metadata/identity/oauth2/token?resource=https%3A%2F%2Fmanagement.core.windows.net%2F&api-version=2018-02-01 HTTP/1.1" 200 1611
+1868 : 2019-07-02 08:57:38,981 : DEBUG : msrestazure.azure_active_directory : MSI: Retrieving a token from http://169.254.169.254/metadata/identity/oauth2/token, with payload {'resource': 'https://management.core.windows.net/', 'api-version': '2018-02-01'}
+1868 : 2019-07-02 08:57:38,981 : DEBUG : msrestazure.azure_active_directory : MSI: Token retrieved
+1868 : 2019-07-02 08:57:38,981 : INFO : cli.azure.cli.core._profile : MSI: token was retrieved. Now trying to initialize local accounts...
+1868 : 2019-07-02 08:57:39,066 : DEBUG : msrest.universal_http.requests : Configuring retry: max_retries=4, backoff_factor=0.8, max_backoff=90
+1868 : 2019-07-02 08:57:39,081 : DEBUG : msrest.async_paging : Paging async iterator protocol is not available for SubscriptionPaged
+1868 : 2019-07-02 08:57:39,081 : DEBUG : msrest.universal_http : Configuring redirects: allow=True, max=30
+1868 : 2019-07-02 08:57:39,081 : DEBUG : msrest.universal_http : Configuring request: timeout=100, verify=True, cert=None
+1868 : 2019-07-02 08:57:39,081 : DEBUG : msrest.universal_http : Configuring proxies: ''
+1868 : 2019-07-02 08:57:39,081 : DEBUG : msrest.universal_http : Evaluate proxies against ENV settings: True
+1868 : 2019-07-02 08:57:39,081 : DEBUG : urllib3.connectionpool : Starting new HTTPS connection (1): management.azure.com:443
+1868 : 2019-07-02 08:57:40,811 : DEBUG : urllib3.connectionpool : https://management.azure.com:443 "GET /subscriptions?api-version=2016-06-01 HTTP/1.1" 200 133
+1868 : 2019-07-02 08:57:40,811 : ERROR : cli.azure.cli.core.util : No access was configured for the VM, hence no subscriptions were found
+1868 : 2019-07-02 08:57:40,811 : ERROR : cli.azure.cli.core.util : No access was configured for the VM, hence no subscriptions were found
+1868 : 2019-07-02 08:57:40,811 : INFO : az_command_data_logger : exit code: 1
+1868 : 2019-07-02 08:57:40,843 : INFO : telemetry.save : Save telemetry record of length 2424 in cache
+1868 : 2019-07-02 08:57:40,843 : WARNING : telemetry.check : Negative: The C:\Users\testuser\.azure\telemetry.txt was modified at 2019-07-02 08:57:18.042457, which in less than 600.000000 s
+1868 : 2019-07-02 08:57:40,843 : INFO : cli.__main__ : command ran in 3.126 seconds.
+```
