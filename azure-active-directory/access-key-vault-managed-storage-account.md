@@ -1,4 +1,4 @@
-# Creating and accessing Azure Key Vault managed storage account with Azure CLI
+# Creating and accessing Azure Key Vault managed storage account
 
 ## Prerequisites
 
