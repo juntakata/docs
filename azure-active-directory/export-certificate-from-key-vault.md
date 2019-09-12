@@ -75,6 +75,7 @@ $secret = Get-AzKeyVaultSecret -VaultName $vaultName -Name $secretIdParts
 $secretByte = [Convert]::FromBase64String($secret.SecretValueText)
 $x509Cert = new-object System.Security.Cryptography.X509Certificates.X509Certificate2
 $x509Cert.Import($secretByte, "", "Exportable,PersistKeySet")
+$type = [System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx
 $pfxFileByte = $x509Cert.Export($type, $password)
 
 # Write to a file
