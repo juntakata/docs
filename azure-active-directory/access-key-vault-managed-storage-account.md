@@ -248,7 +248,22 @@ Now the SAS definition is stored in Key Vault secret. You can see the Key Vault 
 ?sv=2018-03-28&ss=***ADBr1wifv3CXZ7Rw%3D
 ```
 
-## Create C# .NET Core Console Application
+## Access sotrage blob from PowerShell
+
+```
+$context = New-AzStorageContext -StorageAccountName "juntakatakeyvltsa" -SasToken $value.SecretValueText
+$context | Get-AzStorageBlob -Container "kvblob"
+
+   Container Uri: https://juntakatakvsa.blob.core.windows.net/kvblob
+
+Name                 BlobType  Length          ContentType                    LastModified         AccessTier SnapshotTime         IsDeleted
+----                 --------  ------          -----------                    ------------         ---------- ------------         ---------
+test.txt             BlockBlob 4               text/plain                     2019-12-05 17:41:28Z Hot                             False
+   
+$context | Get-AzStorageBlobContent -Container "kvblob" -Blob "test.txt" -Destination "C:\temp"
+```
+
+## Access storage blob using C# .NET Core Console Application
 
 1. Open Visual Studio and create a new project.
 2. From Tools menu, go to NuGet Package Manager and Package Manager Console
