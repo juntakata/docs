@@ -7,7 +7,7 @@
 3. Select [App registrations]
 4. Select [+ New registration]
 5. Specify new name and select [Public client (mobile & desktop)]
-6. Specify https://localhost as a redirect URI.
+6. Specify <https://localhost> as a redirect URI.
 7. Select [Register]
 8. Copy Application (client) ID
 9. Go to [API permissions]
@@ -20,9 +20,9 @@
 
 ## Acquire token
 
-### Request
+Request
 
-```
+```text
 https://login.microsoftonline.com/contoso.onmicrosoft.com/oauth2/token
 
 password: Password
@@ -32,7 +32,7 @@ resource: https://manage.office.com
 client_id: 6e2c4902-3cfc-41b9-bd72-b58c753dbf7d
 ```
 
-### Response
+Response
 
 ```json
 {
@@ -50,15 +50,15 @@ client_id: 6e2c4902-3cfc-41b9-bd72-b58c753dbf7d
 
 ## Start Office 365 Maangement API Subscription
 
-### Request
+Request
 
-```
+```text
 POST https://manage.office.com/api/v1.0/d7a85814-4d89-4baf-8a8a-f5be8306a959/activity/feed/subscriptions/start?contentType=Audit.AzureActiveDirectory
 Content-Type:application/json
 Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSU...
 ```
 
-### Response
+Response
 
 ```json
 {
@@ -70,14 +70,14 @@ Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSU...
 
 ## List current subscriptions
 
-### Request
+Request
 
-```
+```text
 GET https://manage.office.com/api/v1.0/d7a85814-4d89-4baf-8a8a-f5be8306a959/activity/feed/subscriptions/list
 Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSU...
 ```
 
-### Response
+Response
 
 ```json
 [
@@ -91,14 +91,14 @@ Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSU...
 
 ## List available content
 
-### Request
+Request
 
-```
+```text
 GET https://manage.office.com/api/v1.0/d7a85814-4d89-4baf-8a8a-f5be8306a959/activity/feed/subscriptions/content?contentType=Audit.AzureActiveDirectory
 Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSU...
 ```
 
-### Response
+Response
 
 ```json
 [
@@ -121,14 +121,14 @@ Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSU...
 
 ## Retrieving content
 
-### Request
+Request
 
-```
+```text
 GET https://manage.office.com/api/v1.0/d7a85814-4d89-4baf-8a8a-f5be8306a959/activity/feed/audit/20190528031411916085508$20190528041503354028379$audit_azureactivedirectory$Audit_AzureActiveDirectory$apac0015
 Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSU...
 ```
 
-### Response
+Response
 
 ```json
 [
@@ -196,15 +196,15 @@ Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSU...
 
 ## Stop a subscription
 
-### Request
+Request
 
-```
+```text
 POST https://manage.office.com/api/v1.0/d7a85814-4d89-4baf-8a8a-f5be8306a959/activity/feed/subscriptions/stop?contentType=Audit.AzureActiveDirectory
 Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSU...
 ```
 
-### Response
+Response
 
-```
+```text
 HTTP/1.1 204 No Content
 ```

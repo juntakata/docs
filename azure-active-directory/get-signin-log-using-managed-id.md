@@ -66,3 +66,4 @@ value           : {@{id=77253a0f-2f6a-4d67-bf59-a2123cfd2800; createdDateTime=20
                   riskState=none; riskEventTypes=System.Object[]; resourceDisplayName=Windows Azure Active Directory;
                   resourceId=00000002-0000-0000-c000-000000000000; status=; deviceDetail=; location=;
                   appliedConditionalAccessPolicies=System.Object[]}}
+```

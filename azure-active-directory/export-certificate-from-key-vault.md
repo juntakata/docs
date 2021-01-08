@@ -1,6 +1,6 @@
 # Export Key Vault Certificate
 
-You can programatically download certificates on Azure Key Vault with samples below. 
+You can programatically download certificates on Azure Key Vault with samples below.
 
 ## C# sample code
 

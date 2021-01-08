@@ -11,13 +11,13 @@
 7. In Authentication blade, select "Yes" for Default client type option to allow ROPC flow.
 8. Press [Save] button
 9. Go to API permissions blade
-10. Press [+ Add a permission] 
+10. Press [+ Add a permission]
 11. Find Exchange from Supported legacy APIs section and press it
 12. Select [Delegated permission]
 13. press [Grant consent].
 14. Enalbe [EWS.AccessAsUser.All]
 15. Select [Add permissions]
-16. Press [Grant admin consent for <your tenant name>]
+16. Press [Grant admin consent for {your tenant name}]
 
 ## Build sample .NET Standard console application
 

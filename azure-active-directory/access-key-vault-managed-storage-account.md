@@ -9,34 +9,37 @@
 
 1. Login with Azure CLI.
 
+    ```text
+    az login
+    az account set --subscription <ID>
     ```
-    $ az login
-    $ az account set --subscription <ID>
-    ```
-2.  Get the resource ID of the storage account
 
+2. Get the resource ID of the storage account
+
+    ```text
+    az storage account show -n storageaccountname 
     ```
-    $ az storage account show -n storageaccountname 
-    ```
-    
-    ```
+
+    ```text
     /subscriptions/xxxxxxxx-4516-450e-a37f-76e65755465f/resourceGroups/ResourceGroup/providers/Microsoft.Storage/storageAccounts/StorageAccountName
     ```
 
 3. Find an object id of Azure Key Vault service principal. cfa8b339-82a2-471a-a3c9-0fc0be7a4093 is an application ID of Key Vault on Azure public cloud.
 
+    ```text
+    az ad sp show --id cfa8b339-82a2-471a-a3c9-0fc0be7a4093
     ```
-    $ az ad sp show --id cfa8b339-82a2-471a-a3c9-0fc0be7a4093
-    ```
-    ```
+
+    ```text
     "objectId": "bffbdcb7-0c5c-4765-96ad-1b78655a6ce1"
     ```
 
 4. Set permission to the service principal object of Azure Key Vault
 
+    ```text
+    az role assignment create --role "Storage Account Key Operator Service Role" --assignee-object-id "bffbdcb7-0c5c-4765-96ad-1b78655a6ce1" --scope "/subscriptions/xxxxxxxx-4516-450e-a37f-76e65755465f/resourceGroups/keyvlt-prod-rg/providers/Microsoft.Storage/storageAccounts/juntakatakvsa"
     ```
-    $ az role assignment create --role "Storage Account Key Operator Service Role" --assignee-object-id "bffbdcb7-0c5c-4765-96ad-1b78655a6ce1" --scope "/subscriptions/xxxxxxxx-4516-450e-a37f-76e65755465f/resourceGroups/keyvlt-prod-rg/providers/Microsoft.Storage/storageAccounts/juntakatakvsa"
-    ```
+
     ```json
     {
       "canDelegate": null,
@@ -52,9 +55,10 @@
 
 5. Create a Key Vault Managed Storage Account.
 
+    ```text
+    az keyvault storage add --vault-name keyvlt-prod-kv -n juntakatakvsa --active-key-name key1 --auto-regenerate-key --regeneration-period P90D --resource-id "/subscriptions/xxxxxxxx-4516-450e-a37f-76e65755465f/resourceGroups/keyvlt-prod-rg/providers/Microsoft.Storage/storageAccounts/juntakatakvsa"
     ```
-    $ az keyvault storage add --vault-name keyvlt-prod-kv -n juntakatakvsa --active-key-name key1 --auto-regenerate-key --regeneration-period P90D --resource-id "/subscriptions/xxxxxxxx-4516-450e-a37f-76e65755465f/resourceGroups/keyvlt-prod-rg/providers/Microsoft.Storage/storageAccounts/juntakatakvsa"
-    ```
+
     ```json
     {
       "activeKeyName": "key1",
@@ -74,18 +78,20 @@
 
 6. Create a SAS token
 
+    ```text
+    az storage account generate-sas --expiry 2020-01-01 --permissions rw --resource-types sco --services bfqt --https-only --account-name juntakatakvsa --account-key 00000000
     ```
-    $ az storage account generate-sas --expiry 2020-01-01 --permissions rw --resource-types sco --services bfqt --https-only --account-name juntakatakvsa --account-key 00000000
-    ```
-    ```
+
+    ```text
     "se=2020-01-01&sp=***gbeBWJaFUYLpbPa9hWP9HPA4Tno%3D"
     ```
 
 7. Create a SAS Definition
 
+    ```text
+    az keyvault storage sas-definition create --vault-name keyvlt-prod-kv --account-name juntakatakvsa -n juntakatasasdefinition --validity-period P90D --sas-type account --template-uri "se=2020-01-01&sp=***gbeBWJaFUYLpbPa9hWP9HPA4Tno%3D"
     ```
-    $ az keyvault storage sas-definition create --vault-name keyvlt-prod-kv --account-name juntakatakvsa -n juntakatasasdefinition --validity-period P90D --sas-type account --template-uri "se=2020-01-01&sp=***gbeBWJaFUYLpbPa9hWP9HPA4Tno%3D"
-    ```
+
     ```json
     {
       "attributes": {
@@ -105,9 +111,10 @@
 
 8. Run a command as below to regenerate storage account key
 
+    ```text
+    az keyvault storage regenerate-key --vault-name keyvlt-prod-kv --name juntakatakvsa --key-name key1
     ```
-    $ az keyvault storage regenerate-key --vault-name keyvlt-prod-kv --name juntakatakvsa --key-name key1
-    ```
+
     ```json
     {
         "activeKeyName": "key1",
@@ -127,9 +134,10 @@
 
 You can now see the Key Vault secret as below.
 
+```text
+az keyvault secret show --vault-name keyvlt-prod-kv --name juntakatakvsa-juntakatasasdefinition
 ```
-$ az keyvault secret show --vault-name keyvlt-prod-kv --name juntakatakvsa-juntakatasasdefinition
-```
+
 ```json
 {
   "attributes": {
@@ -153,13 +161,14 @@ $ az keyvault secret show --vault-name keyvlt-prod-kv --name juntakatakvsa-junta
 
 1. Login with Azure PowerShell.
 
-    ```
+    ```text
     > Connect-AzAccount
     > Set-AzContext -SubscriptionId <ID>
     ```
-2.  Get a storage account
 
-    ```
+2. Get a storage account
+
+    ```text
     > $resourceGroupName = "keyvlt-prod-rg"
     > $storageAccountName = "juntakatakeyvltsa"
     > $storageAccountKey = "key1"
@@ -171,7 +180,7 @@ $ az keyvault secret show --vault-name keyvlt-prod-kv --name juntakatakvsa-junta
 
 3. Set permission to the service principal object of Azure Key Vault
 
-    ```
+    ```text
     > New-AzRoleAssignment -ApplicationId $keyVaultSpAppId -RoleDefinitionName 'Storage Account Key Operator Service Role' -Scope $storageAccount.Id
 
     RoleAssignmentId   : /subscriptions/xxxxxxxx-4516-450e-a37f-76e65755465f/resourceGroups/keyvlt-prod-rg/providers/Microsoft.Storage/storageAccounts/juntakatakeyvltsa/providers/Microsoft.Authorization/roleAssignments/b909a59b-9fe0-4312-8fe8-5b74b27d4563
@@ -185,13 +194,13 @@ $ az keyvault secret show --vault-name keyvlt-prod-kv --name juntakatakvsa-junta
     CanDelegate        : False
     ```
 
-    ```
+    ```text
     > Set-AzKeyVaultAccessPolicy -VaultName $keyVaultName -UserPrincipalName jutakata@jutakata02.onmicrosoft.com -PermissionsToStorage get, list, listsas, delete, set, update, regeneratekey, recover, backup, restore, purge, setsas
     ```
 
 4. Create a Key Vault Managed Storage Account.
 
-    ```
+    ```text
     > $regenPeriod = [System.Timespan]::FromDays(90)
 
     > Add-AzKeyVaultManagedStorageAccount -VaultName $keyVaultName -AccountName $storageAccountName -AccountResourceId $storageAccount.Id -ActiveKeyName $storageAccountKey -RegenerationPeriod $regenPeriod
@@ -210,9 +219,9 @@ $ az keyvault secret show --vault-name keyvlt-prod-kv --name juntakatakvsa-junta
     Tags                :
     ```
 
-6. Create a SAS token
+5. Create a SAS token
 
-    ```
+    ```text
     > $storagecontext = New-AzStorageContext -StorageAccountName $storageAccountName -StorageAccountKey key1
 
     > New-AzStorageAccountSASToken -ExpiryTime 2020-01-01 -Permission rw -ResourceType Service,Container,Object -Service Blob,File,Table,Queue -Protocol HttpsOnly -Context $storagecontext
@@ -220,9 +229,9 @@ $ az keyvault secret show --vault-name keyvlt-prod-kv --name juntakatakvsa-junta
     ?sv=2018-03-28&sig=***3A00Z&srt=sco&ss=bfqt&sp=rw
     ```
 
-7. Create a SAS Definition
+6. Create a SAS Definition
 
-    ```
+    ```text
     > Set-AzKeyVaultManagedStorageSasDefinition -VaultName $keyVaultName -StorageAccountName $storageAccountName -Name juntakatakeyvltsasdefinition -ValidityPeriod ([System.Timespan]::FromDays(30)) -SasType 'account' -TemplateUri "?sv=2018-03-28&sig=***3A00Z&srt=sco&ss=bfqt&sp=rw"
 
 
@@ -240,7 +249,7 @@ $ az keyvault secret show --vault-name keyvlt-prod-kv --name juntakatakvsa-junta
 
 Now the SAS definition is stored in Key Vault secret. You can see the Key Vault secret as below.
 
-```
+```text
 > $value = Get-AzKeyVaultSecret -VaultName $keyVaultName -Name juntakatakeyvltsa-juntakatakeyvltsasdefinition
 
 > $value.SecretValueText
@@ -250,7 +259,7 @@ Now the SAS definition is stored in Key Vault secret. You can see the Key Vault 
 
 ## Access sotrage blob from PowerShell
 
-```
+```text
 $context = New-AzStorageContext -StorageAccountName "juntakatakeyvltsa" -SasToken $value.SecretValueText
 $context | Get-AzStorageBlob -Container "kvblob"
 
@@ -269,7 +278,7 @@ $context | Get-AzStorageBlobContent -Container "kvblob" -Blob "test.txt" -Destin
 2. From Tools menu, go to NuGet Package Manager and Package Manager Console
 3. Run following commands
 
-    ```
+    ```text
     Install-Package Microsoft.Azure.KeyVault -Version 3.0.3
     Install-Package Microsoft.IdentityModel.Clients.ActiveDirectory
     Install-Package WindowsAzure.Storage

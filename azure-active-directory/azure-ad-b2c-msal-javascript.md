@@ -16,7 +16,7 @@
 3. On the Recommended tab, select the Sign up and sign in user flow
 4. Enter a Name for the user flow. For example, SignUpAndSignIn.
 5. For Identity providers, select Email signup.
-6. For User attributes and claims, choose the claims and attributes that you want to collect and send from the user during sign-up. 
+6. For User attributes and claims, choose the claims and attributes that you want to collect and send from the user during sign-up.
 7. Cick Create to add the user flow. A prefix of B2C_1 is automatically appended to the name.
 
 ## Create a html file

@@ -2,21 +2,20 @@
 
 ## Create an Azure service principal with Azure PowerShell
 
-### Password-based authentication
+If you want to use password for sign-in credentials, use below.
+
 ```powershell
 Import-Module Az.Resources # Imports the PSADPasswordCredential object
 $credentials = New-Object Microsoft.Azure.Commands.ActiveDirectory.PSADPasswordCredential -Property @{ StartDate=Get-Date; EndDate=Get-Date -Year 2024; Password=<Choose a strong password>}
 $sp = New-AzAdServicePrincipal -DisplayName ServicePrincipalName -PasswordCredential $credentials
 ```
 
-### Certificate-based authentication
+For certificate-based authentication, use below.
 
 ```powershell
 $cert = <public certificate as base64-encoded string>
 $sp = New-AzADServicePrincipal -DisplayName ServicePrincipalName -CertValue $cert
 ```
-
-### Manage service principal roles
 
 The default role for a service principal is Contributor. This role has full permissions to read and write to an Azure account. The Reader role is more restrictive, with read-only access.
 
@@ -27,14 +26,12 @@ Remove-AzRoleAssignment -ApplicationId <service principal application ID> -RoleD
 
 ## Sign in using a service principal
 
-### Password-based authentication
+To sign-in using a password, run a command below.
 
 ```powershell
 $credentials = Get-Credential
 Connect-AzAccount -ServicePrincipal -Credential $credentials -Tenant <tenant ID>
 ```
-
-### Certificate-based authentication
 
 Certificate-based authentication requires that Azure PowerShell can retrieve information from a local certificate store based on a certificate thumbprint.
 
@@ -42,9 +39,9 @@ Certificate-based authentication requires that Azure PowerShell can retrieve inf
 Connect-AzAccount -ServicePrincipal -TenantId $tenantId -CertificateThumbprint <thumbprint>
 ```
 
-## Assign directory roles to a service principal
+## Assign directory roles
 
-A service principal has no directory role by default. The Directory Reader role is restrictive, with read-only access. 
+A service principal has no directory role by default. The Directory Reader role is restrictive, with read-only access.
 
 ```powershell
 # Install Azure AD PowerShell

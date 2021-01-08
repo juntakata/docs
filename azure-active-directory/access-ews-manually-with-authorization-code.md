@@ -25,7 +25,7 @@
 
 Replace the client_id with the one you copied above on Azure portal and access the URL with a browser.
 
-```
+```text
 GET https://login.microsoftonline.com/contoso.onmicrosoft.com/oauth2/authorize?client_id=8ed26df8-25dd-41a5-bf0e-81940e3984f5&nonce=defaultNonce&redirect_uri=https%3A%2F%2Flocalhost&scope=openid%20offline_access&response_type=code&prompt=login&grant_type=authorization_code&resource=https%3A%2F%2Foutlook.office365.com
 ```
 
@@ -33,7 +33,7 @@ GET https://login.microsoftonline.com/contoso.onmicrosoft.com/oauth2/authorize?c
 
 After the authentication, you will be shown a consent screen and redirected URL below.
 
-```
+```text
 GET https://localhost/?code=AQABAAIAAADCoMpjJXrxTq9VG9te<omit>gHdxcBncIqj3VvQ0mPCAnXNyB8IAA&session_state=0e11bd4c-4065-47a6-b7e4-d4c1312d1054
 ```
 
@@ -45,13 +45,13 @@ Copy code in the response and start a POST request as below
 
 #### URL
 
-```
+```text
 POST https://login.microsoftonline.com/contoso.onmicrosoft.com/oauth2/token
 ```
 
 #### Body
 
-```
+```text
 code:AQABAAIAAADCoMpjJXrxTq9VG9te<omit>gHdxcBncIqj3VvQ0mPCAnXNyB8IAA
 grant_type:authorization_code
 client_id:8ed26df8-25dd-41a5-bf0e-81940e3984f5
@@ -85,13 +85,13 @@ Send POST request to URL below to gain results.
 
 #### URL
 
-```
+```text
 POST https://outlook.office365.com/ews/exchange.asmx 
 ```
 
 #### Header
 
-```
+```text
 Content-Type:text/xml
 Authorization:Bearer eyJ0eXAiOiJKV1QiLCJub25jZSI6<omit>uDt48b786GLm1W9eZAGLWK6fLKw
 ```
