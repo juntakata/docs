@@ -7,7 +7,17 @@
 
 To capture a Fiddler trace for Azure CLI, you need to set some environment variables. These variables apply for all Azure CLI environments such as Windows, Linux, and etc.
 
+PowerShell
+
+```powershell
+$env:AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
+$env:HTTP_PROXY="http://localhost:8888"
+$env:HTTPS_PROXY="http://localhost:8888"
 ```
+
+Bash
+
+```bash
 set AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
 set HTTPS_PROXY=https://127.0.0.1:8888
 set HTTP_PROXY=http://127.0.0.1:8888
