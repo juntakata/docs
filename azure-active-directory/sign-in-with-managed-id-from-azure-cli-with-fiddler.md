@@ -25,7 +25,17 @@ set HTTP_PROXY=http://127.0.0.1:8888
 
 After capturing the trace, disable each variables as below.
 
+PowerShell
+
+```powershell
+Remove-Item env:AZURE_CLI_DISABLE_CONNECTION_VERIFICATION
+Remove-Item env:HTTP_PROXY
+Remove-Item env:HTTPS_PROXY
 ```
+
+Bash
+
+```bash
 set AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=
 set HTTPS_PROXY=
 set HTTP_PROXY=
