@@ -199,6 +199,8 @@ Date: Sat, 11 Feb 2023 22:17:32 GMT
 }
 ```
 
+## Authenticator での共有
+
 ユーザーが共有に同意すると以下の処理が Authenticator アプリから生じます。
 
 Request
