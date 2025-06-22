@@ -35,12 +35,6 @@ In Visual Studio, create a .NET console application. This sample uses the Signed
 > The System.Security.Cryptography.Xml package must be added to your project manually via NuGet.
 
 ```csharp
-In the sample code:
-
-The green section intentionally generates a multipleauthn element for SAML 1.1 inside a SAML 2.0 assertion.
-This is to test how Entra ID handles such a scenario.
-Normally, you should remove the green section and use the yellow section instead.
-
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Text;
