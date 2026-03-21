@@ -13,194 +13,193 @@ $cert = New-SelfSignedCertificate `
 $cert
 ```
 
-## Step 2: Export the Certificate in BASE64 Format
+## Step 2: Export the Certificate as .cer (BASE64 format) and .pfx
 
-Once the certificate is created, export it from the certificate store in BASE64 format. Open the exported file in Notepad and copy the certificate body (the part between -----BEGIN CERTIFICATE----- and -----END CERTIFICATE-----).
+1. Once the certificate is created, run "certmgr.msc" and export the certfiicate as .cer (BASE64 format) and .pfx
+2. Open the exported .cer file in Notepad and copy the certificate body (the part between -----BEGIN CERTIFICATE----- and -----END CERTIFICATE-----).
 
 ## Step 3: Register the Certificate with Entra ID for Federation
 
-Use the following PowerShell command to register the certificate as a token-signing certificate for a federated domain in Entra ID. Replace the domain and URIs as needed:
+Use the following PowerShell command to register the certificate as a token-signing certificate for a federated domain in Entra ID. Replace the domain and URIs as needed and replace the value of the -SigningCertificate option with the actual BASE64-encoded certificate string you collected in the step 2.
 
 ```powershell
+Connect-MgGraph -Scopes "Domain.ReadWrite.All"
+
 New-MgDomainFederationConfiguration -DomainId "sts.contoso.com" -ActiveSignInUri "https://sts.contoso.com/adfs/services/trust/2005/usernamemixed" -DisplayName "Contoso" -IssuerUri "http://sts.contoso.com/adfs/services/trust" -PassiveSignInUri "https://sts.contoso.com/adfs/ls/" -SignOutUri "https://sts.contoso.com/adfs/ls/" -SigningCertificate "MIIDCDCCAfCgAwIBAgIQIoSM...yczX2cgr6m3j/Pmep" -PreferredAuthenticationProtocol "saml" -FederatedIdPMfaBehavior "acceptIfMfaDoneByFederatedIdp" -MetadataExchangeUri "https://sts.contoso.com/adfs/services/trust/mex"
 ```
 
-Replace <BASE64_CERT_HERE> with the actual BASE64-encoded certificate string.
-
 ## Step 4: Create a .NET Console App to Sign SAML Assertions
 
-In Visual Studio, create a .NET console application. This sample uses the SignedXml class from System.Security.Cryptography.Xml to sign SAML assertions.
+Save the following PowerShell script as SamlResponseGenerator.ps1.
 
-> [!NOTE]
-> The System.Security.Cryptography.Xml package must be added to your project manually via NuGet.
+```powershell
+param(
+    [Parameter(Mandatory=$true)][string]$IssuerUrl,
+    [Parameter(Mandatory=$true)][string]$NameId,
+    [Parameter(Mandatory=$true)][string]$CertificatePath,
+    [Parameter(Mandatory=$true)][string]$CertPassword
+)
 
-```csharp
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Cryptography.Xml;
-using System.Text;
-using System.Xml;
+Add-Type -AssemblyName System.Security.Cryptography.Xml
 
-class Program
-{
-    static void Main()
-    {
-        // Define inputs
-        string issuerUrl = "http://sts.contoso.com/adfs/services/trust";
-        string nameId = "gPqi4EiVx0OzaxbNb/QeyQ==";
+function Sign-Xml([System.Xml.XmlDocument]$doc, [System.Security.Cryptography.X509Certificates.X509Certificate2]$cert) {
+    $signedXml = [System.Security.Cryptography.Xml.SignedXml]::new($doc)
+    $signedXml.SigningKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($cert)
 
-        string certificatePath = "C:\\cert.pfx";
-        string certPassword = "xxxxxxxx";
+    $id = $doc.GetElementsByTagName("Assertion")[0].Attributes["ID"].Value
+    $reference = [System.Security.Cryptography.Xml.Reference]::new()
+    $reference.Uri = "#$id"
 
-        // Load certificate
-        X509Certificate2 cert = new X509Certificate2(certificatePath, certPassword);
+    # Enveloped signature transform
+    $env = [System.Security.Cryptography.Xml.XmlDsigEnvelopedSignatureTransform]::new()
+    $reference.AddTransform($env)
 
-        // Generate SAML response
-        string samlResponse = GenerateSamlResponse(issuerUrl, nameId, cert);
+    # Exclusive canonicalization transform
+    $excC14N = [System.Security.Cryptography.Xml.XmlDsigExcC14NTransform]::new()
+    $reference.AddTransform($excC14N)
+    $signedXml.AddReference($reference)
 
-        var bytes = Encoding.UTF8.GetBytes(samlResponse);
-        var base64 = Convert.ToBase64String(bytes);
-        Console.WriteLine("Generated SAML Response:\n" + base64);
+    # KeyInfo with X509 certificate data
+    $keyInfo = [System.Security.Cryptography.Xml.KeyInfo]::new()
+    $keyInfo.AddClause([System.Security.Cryptography.Xml.KeyInfoX509Data]::new($cert))
+    $signedXml.KeyInfo = $keyInfo
+
+    # Exclusive canonicalization for SignedInfo
+    $signedXml.SignedInfo.CanonicalizationMethod = [System.Security.Cryptography.Xml.SignedXml]::XmlDsigExcC14NTransformUrl
+
+    $signedXml.ComputeSignature()
+
+    $signatureElement = $signedXml.GetXml()
+    if ($signatureElement.GetAttribute("xmlns:ds") -eq "") {
+        $signatureElement.SetAttribute("xmlns:ds", "http://www.w3.org/2000/09/xmldsig#")
     }
 
-    static string GenerateSamlResponse(string issuer, string nameId, X509Certificate2 cert)
-    {
-        var xmlDoc = new XmlDocument();
-
-        var samlResponseElem = xmlDoc.CreateElement("samlp", "Response", "urn:oasis:names:tc:SAML:2.0:protocol");
-        
-        samlResponseElem.SetAttribute("Version", "2.0");
-        samlResponseElem.SetAttribute("IssueInstant", DateTime.UtcNow.ToString("o"));
-        samlResponseElem.SetAttribute("Destination", "https://login.microsoftonline.com/login.srf");
-        samlResponseElem.SetAttribute("ID", "_" + Guid.NewGuid().ToString());
-        samlResponseElem.SetAttribute("Consent", "urn:oasis:names:tc:SAML:2.0:consent:unspecified");
-
-        var issuerElem = xmlDoc.CreateElement("", "Issuer", "urn:oasis:names:tc:SAML:2.0:assertion");
-        issuerElem.InnerText = issuer;
-        samlResponseElem.AppendChild(issuerElem);
-
-        var statusElem = xmlDoc.CreateElement("samlp", "Status", "urn:oasis:names:tc:SAML:2.0:protocol");
-        var statusCodeElem = xmlDoc.CreateElement("samlp", "StatusCode", "urn:oasis:names:tc:SAML:2.0:protocol");
-        statusCodeElem.SetAttribute("Value", "urn:oasis:names:tc:SAML:2.0:status:Success");
-        statusElem.AppendChild(statusCodeElem);
-        samlResponseElem.AppendChild(statusElem);
-
-        var assertionElem = xmlDoc.CreateElement("", "Assertion", "urn:oasis:names:tc:SAML:2.0:assertion");
-        assertionElem.SetAttribute("Version", "2.0");
-        assertionElem.SetAttribute("IssueInstant", DateTime.UtcNow.ToString("o"));
-        assertionElem.SetAttribute("ID", "_93654ac3-f056-4a83-bda9-63828536aa08"); // same value as SessionIndex in AuthnStatement
-
-        var assertionIssuerElem = xmlDoc.CreateElement("", "Issuer", "urn:oasis:names:tc:SAML:2.0:assertion");
-        assertionIssuerElem.InnerText = issuer;
-        assertionElem.AppendChild(assertionIssuerElem);
-
-        var subjectElem = xmlDoc.CreateElement("", "Subject", "urn:oasis:names:tc:SAML:2.0:assertion");
-        var nameIdElem = xmlDoc.CreateElement("", "NameID", "urn:oasis:names:tc:SAML:2.0:assertion");
-        nameIdElem.SetAttribute("Format", "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent");
-        nameIdElem.InnerText = nameId;
-        var subjectConfirmationElem = xmlDoc.CreateElement("", "SubjectConfirmation", "urn:oasis:names:tc:SAML:2.0:assertion");
-        subjectConfirmationElem.SetAttribute("Method", "urn:oasis:names:tc:SAML:2.0:cm:bearer");
-        var subjectConfirmationDataElem = xmlDoc.CreateElement("", "SubjectConfirmationData", "urn:oasis:names:tc:SAML:2.0:assertion");
-        subjectConfirmationDataElem.SetAttribute("Recipient", "https://login.microsoftonline.com/login.srf");
-        subjectConfirmationDataElem.SetAttribute("NotOnOrAfter", DateTime.UtcNow.AddMinutes(-5).AddHours(1).ToString("o"));
-        subjectConfirmationElem.AppendChild(subjectConfirmationDataElem);
-        subjectElem.AppendChild(nameIdElem);
-        subjectElem.AppendChild(subjectConfirmationElem);
-        assertionElem.AppendChild(subjectElem);
-
-        var conditionElem = xmlDoc.CreateElement("", "Conditions", "urn:oasis:names:tc:SAML:2.0:assertion");
-        conditionElem.SetAttribute("NotBefore", DateTime.UtcNow.AddMinutes(-5).ToString("o"));
-        conditionElem.SetAttribute("NotOnOrAfter", DateTime.UtcNow.AddMinutes(-5).AddHours(1).ToString("o"));
-        var audienceRestrictionElem = xmlDoc.CreateElement("", "AudienceRestriction", "urn:oasis:names:tc:SAML:2.0:assertion");
-        var audienceElem = xmlDoc.CreateElement("", "Audience", "urn:oasis:names:tc:SAML:2.0:assertion");
-        audienceElem.InnerText = "urn:federation:MicrosoftOnline";
-        audienceRestrictionElem.AppendChild(audienceElem);
-        conditionElem.AppendChild(audienceRestrictionElem);
-        assertionElem.AppendChild(conditionElem);
-
-        var attributeStatementElem = xmlDoc.CreateElement("", "AttributeStatement", "urn:oasis:names:tc:SAML:2.0:assertion");
-
-        // Attribute Element 1
-        var attributeElem1 = xmlDoc.CreateElement("", "Attribute", "urn:oasis:names:tc:SAML:2.0:assertion");
-        attributeElem1.SetAttribute("Name", "http://schemas.microsoft.com/LiveID/Federation/2008/05/ImmutableID");
-        var AttributeValueElem1 = xmlDoc.CreateElement("", "AttributeValue", "urn:oasis:names:tc:SAML:2.0:assertion");
-        AttributeValueElem1.InnerText = nameId;
-        attributeElem1.AppendChild(AttributeValueElem1);
-        attributeStatementElem.AppendChild(attributeElem1);
-
-        // Attribute Element 2...
-
-        // Add an AuthnStatement.
-        var authnStatementElem = xmlDoc.CreateElement("", "AuthnStatement", "urn:oasis:names:tc:SAML:2.0:assertion");
-        authnStatementElem.SetAttribute("AuthnInstant", DateTime.UtcNow.AddMinutes(-5).ToString("o"));
-        authnStatementElem.SetAttribute("SessionIndex", "_93654ac3-f056-4a83-bda9-63828536aa08"); // same value as SessionIndex in AuthnStatement
-        var authnContextElem = xmlDoc.CreateElement("", "AuthnContext", "urn:oasis:names:tc:SAML:2.0:assertion");
-        var authnContextClassRefElem = xmlDoc.CreateElement("", "AuthnContextClassRef", "urn:oasis:names:tc:SAML:2.0:assertion");
-        authnContextClassRefElem.InnerText = "http://schemas.microsoft.com/claims/multipleauthn";
-        authnContextElem.AppendChild(authnContextClassRefElem);
-        authnStatementElem.AppendChild(authnContextElem);
-        assertionElem.AppendChild(authnStatementElem);
-
-        samlResponseElem.AppendChild(assertionElem);
-
-        xmlDoc.AppendChild(samlResponseElem);
-
-        // Sign the assertion
-        SignXml(xmlDoc, cert);
-
-        return xmlDoc.OuterXml;
+    # Insert Signature after Issuer inside the Assertion
+    $assertionElem = [System.Xml.XmlElement]$doc.GetElementsByTagName("Assertion")[0]
+    $issuerElem = $null
+    foreach ($child in $assertionElem.ChildNodes) {
+        if ($child -is [System.Xml.XmlElement] -and $child.LocalName -eq "Issuer") {
+            $issuerElem = $child
+            break
+        }
     }
-
-    static void SignXml(XmlDocument doc, X509Certificate2 cert)
-    {
-        SignedXml signedXml = new SignedXml(doc);
-        signedXml.SigningKey = cert.GetRSAPrivateKey();
-
-        string id = doc.GetElementsByTagName("Assertion")[0].Attributes["ID"].Value;
-        Reference reference = new Reference();
-        reference.Uri = "#" + id;
-
-        // Only enveloped signature transform
-        XmlDsigEnvelopedSignatureTransform env = new XmlDsigEnvelopedSignatureTransform();
-        reference.AddTransform(env);
-
-        XmlDsigExcC14NTransform excC14N = new XmlDsigExcC14NTransform();
-        reference.AddTransform(excC14N);
-        signedXml.AddReference(reference);
-
-        // KeyInfo
-        KeyInfo keyInfo = new KeyInfo();
-        keyInfo.AddClause(new KeyInfoX509Data(cert));
-        signedXml.KeyInfo = keyInfo;
-
-        // Exclusive canonicalization for SignedInfo
-        signedXml.SignedInfo.CanonicalizationMethod = SignedXml.XmlDsigExcC14NTransformUrl;
-
-        signedXml.ComputeSignature();
-
-        XmlElement signatureElement = signedXml.GetXml();
-        if (signatureElement.GetAttribute("xmlns:ds") == "")
-            signatureElement.SetAttribute("xmlns:ds", "http://www.w3.org/2000/09/xmldsig#");
-
-        // Insert Signature after Issuer
-        XmlElement assertionElem = (XmlElement)doc.GetElementsByTagName("Assertion")[0];
-        XmlElement issuerElem = null;
-        foreach (XmlNode child in assertionElem.ChildNodes)
-        {
-            if (child is XmlElement elem && elem.LocalName == "Issuer")
-            {
-                issuerElem = elem;
-                break;
-            }
-        }
-        if (issuerElem != null)
-        {
-            assertionElem.InsertAfter(doc.ImportNode(signatureElement, true), issuerElem);
-        }
+    if ($null -ne $issuerElem) {
+        $assertionElem.InsertAfter($doc.ImportNode($signatureElement, $true), $issuerElem) | Out-Null
     }
 }
+
+function New-SamlResponse([string]$issuer, [string]$nameId, [System.Security.Cryptography.X509Certificates.X509Certificate2]$cert) {
+    $xmlDoc = [System.Xml.XmlDocument]::new()
+    $nsProtocol = "urn:oasis:names:tc:SAML:2.0:protocol"
+    $nsAssertion = "urn:oasis:names:tc:SAML:2.0:assertion"
+
+    # Response element
+    $samlResponseElem = $xmlDoc.CreateElement("samlp", "Response", $nsProtocol)
+    $samlResponseElem.SetAttribute("Version", "2.0")
+    $samlResponseElem.SetAttribute("IssueInstant", [DateTime]::UtcNow.ToString("o"))
+    $samlResponseElem.SetAttribute("Destination", "https://login.microsoftonline.com/login.srf")
+    $samlResponseElem.SetAttribute("ID", "_" + [Guid]::NewGuid().ToString())
+    $samlResponseElem.SetAttribute("Consent", "urn:oasis:names:tc:SAML:2.0:consent:unspecified")
+
+    # Issuer
+    $issuerElem = $xmlDoc.CreateElement("", "Issuer", $nsAssertion)
+    $issuerElem.InnerText = $issuer
+    $samlResponseElem.AppendChild($issuerElem) | Out-Null
+
+    # Status
+    $statusElem = $xmlDoc.CreateElement("samlp", "Status", $nsProtocol)
+    $statusCodeElem = $xmlDoc.CreateElement("samlp", "StatusCode", $nsProtocol)
+    $statusCodeElem.SetAttribute("Value", "urn:oasis:names:tc:SAML:2.0:status:Success")
+    $statusElem.AppendChild($statusCodeElem) | Out-Null
+    $samlResponseElem.AppendChild($statusElem) | Out-Null
+
+    # Assertion
+    $assertionElem = $xmlDoc.CreateElement("", "Assertion", $nsAssertion)
+    $assertionElem.SetAttribute("Version", "2.0")
+    $assertionElem.SetAttribute("IssueInstant", [DateTime]::UtcNow.ToString("o"))
+    $assertionElem.SetAttribute("ID", "_93654ac3-f056-4a83-bda9-63828536aa08") # same value as SessionIndex in AuthnStatement
+
+    # Assertion Issuer
+    $assertionIssuerElem = $xmlDoc.CreateElement("", "Issuer", $nsAssertion)
+    $assertionIssuerElem.InnerText = $issuer
+    $assertionElem.AppendChild($assertionIssuerElem) | Out-Null
+
+    # Subject
+    $subjectElem = $xmlDoc.CreateElement("", "Subject", $nsAssertion)
+    $nameIdElem = $xmlDoc.CreateElement("", "NameID", $nsAssertion)
+    $nameIdElem.SetAttribute("Format", "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
+    $nameIdElem.InnerText = $nameId
+    $subjectConfirmationElem = $xmlDoc.CreateElement("", "SubjectConfirmation", $nsAssertion)
+    $subjectConfirmationElem.SetAttribute("Method", "urn:oasis:names:tc:SAML:2.0:cm:bearer")
+    $subjectConfirmationDataElem = $xmlDoc.CreateElement("", "SubjectConfirmationData", $nsAssertion)
+    $subjectConfirmationDataElem.SetAttribute("Recipient", "https://login.microsoftonline.com/login.srf")
+    $subjectConfirmationDataElem.SetAttribute("NotOnOrAfter", [DateTime]::UtcNow.AddMinutes(-5).AddHours(1).ToString("o"))
+    $subjectConfirmationElem.AppendChild($subjectConfirmationDataElem) | Out-Null
+    $subjectElem.AppendChild($nameIdElem) | Out-Null
+    $subjectElem.AppendChild($subjectConfirmationElem) | Out-Null
+    $assertionElem.AppendChild($subjectElem) | Out-Null
+
+    # Conditions
+    $conditionElem = $xmlDoc.CreateElement("", "Conditions", $nsAssertion)
+    $conditionElem.SetAttribute("NotBefore", [DateTime]::UtcNow.AddMinutes(-5).ToString("o"))
+    $conditionElem.SetAttribute("NotOnOrAfter", [DateTime]::UtcNow.AddMinutes(-5).AddHours(1).ToString("o"))
+    $audienceRestrictionElem = $xmlDoc.CreateElement("", "AudienceRestriction", $nsAssertion)
+    $audienceElem = $xmlDoc.CreateElement("", "Audience", $nsAssertion)
+    $audienceElem.InnerText = "urn:federation:MicrosoftOnline"
+    $audienceRestrictionElem.AppendChild($audienceElem) | Out-Null
+    $conditionElem.AppendChild($audienceRestrictionElem) | Out-Null
+    $assertionElem.AppendChild($conditionElem) | Out-Null
+
+    # AttributeStatement
+    $attributeStatementElem = $xmlDoc.CreateElement("", "AttributeStatement", $nsAssertion)
+
+    # Attribute: ImmutableID
+    $attributeElem1 = $xmlDoc.CreateElement("", "Attribute", $nsAssertion)
+    $attributeElem1.SetAttribute("Name", "http://schemas.microsoft.com/LiveID/Federation/2008/05/ImmutableID")
+    $attributeValueElem1 = $xmlDoc.CreateElement("", "AttributeValue", $nsAssertion)
+    $attributeValueElem1.InnerText = $nameId
+    $attributeElem1.AppendChild($attributeValueElem1) | Out-Null
+    $attributeStatementElem.AppendChild($attributeElem1) | Out-Null
+    $assertionElem.AppendChild($attributeStatementElem) | Out-Null
+
+    # AuthnStatement
+    $authnStatementElem = $xmlDoc.CreateElement("", "AuthnStatement", $nsAssertion)
+    $authnStatementElem.SetAttribute("AuthnInstant", [DateTime]::UtcNow.AddMinutes(-5).ToString("o"))
+    $authnStatementElem.SetAttribute("SessionIndex", "_93654ac3-f056-4a83-bda9-63828536aa08") # same value as Assertion ID
+    $authnContextElem = $xmlDoc.CreateElement("", "AuthnContext", $nsAssertion)
+    $authnContextClassRefElem = $xmlDoc.CreateElement("", "AuthnContextClassRef", $nsAssertion)
+    $authnContextClassRefElem.InnerText = "http://schemas.microsoft.com/claims/multipleauthn"
+    $authnContextElem.AppendChild($authnContextClassRefElem) | Out-Null
+    $authnStatementElem.AppendChild($authnContextElem) | Out-Null
+    $assertionElem.AppendChild($authnStatementElem) | Out-Null
+
+    $samlResponseElem.AppendChild($assertionElem) | Out-Null
+    $xmlDoc.AppendChild($samlResponseElem) | Out-Null
+
+    # Sign the assertion
+    Sign-Xml $xmlDoc $cert
+
+    return $xmlDoc.OuterXml
+}
+
+# Load certificate
+$cert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($CertificatePath, $CertPassword)
+
+# Generate SAML response
+$samlResponse = New-SamlResponse $IssuerUrl $NameId $cert
+
+$bytes = [System.Text.Encoding]::UTF8.GetBytes($samlResponse)
+$base64 = [Convert]::ToBase64String($bytes)
+Write-Host "Generated SAML Response:`n$base64"
 ```
 
-User BASE64 converter to check the output. If you find the assertion looks good, now embed it to the following HTML file and save it as a file.
+To run the command:
+
+```powershell
+.\SamlResponseGenerator.ps1 -IssuerUrl "http://sts.contoso.com/adfs/services/trust" -NameId "<on-premises immutable ID>" -CertificatePath "<pfx path>" -CertPassword "<pfx password>"
+```
+
+Use BASE64 converter to check the output. If you find the assertion looks good, now embed it to the following HTML file and save it as a file.
 
 ```html
 <html>
